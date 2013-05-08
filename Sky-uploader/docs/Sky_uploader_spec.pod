@@ -1,0 +1,27 @@
+=encoding utf8
+
+=head1 Sky uploader
+
+=head2 Examples
+
+=head3 Basic invocation:
+
+Basic upload of a video:
+
+    $ sky --to=video "Shine 4U - Carmen and Camille-B8ehY5tutHs.webm"
+
+    # Runs «rsync --inplace -v --progress -a» or whatever to
+    "$__HOMEPAGE_REMOTE_PATH/Files/files/video/"
+
+    # Outputs to the console:
+
+    http://www.shlomifish.org/Files/files/video/Shine%204U%20-%20Carmen%20and%20Camille-B8ehY5tutHs.webm
+
+Next: while pasting the URL to the clipboard:
+
+    $ sky --to=video --copy "Shine 4U - Carmen and Camille-B8ehY5tutHs.webm"
+
+    # Copies the URL to the clipboard.
+
+=cut
+
