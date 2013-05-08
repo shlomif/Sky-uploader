@@ -30,6 +30,15 @@ Uploading an .mp3
     # Outputs to the console:
     http://www.shlomifish.org/Files/files/music/mp3-ogg/Shine4U.mp3
 
+=head2 Considerations
+
+=over 4
+
+=item * Will not allow uploading videos with funny characters
+
+Such as ":", etc. Will use the basename.
+
+=back
 
 =cut
 
