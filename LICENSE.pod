@@ -1,0 +1,23 @@
+=encoding utf8
+
+=head1 LICENSE
+
+=head2 Text
+
+The code here is MIT/X11 Licensed.
+
+Links:
+
+=over 4
+
+=item * MIT/X11 License
+
+L<http://en.wikipedia.org/wiki/MIT_License>
+
+=item * CC-by
+
+L<http://creativecommons.org/licenses/by/3.0/>
+
+=back
+
+=cut
