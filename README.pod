@@ -1,0 +1,32 @@
+=encoding utf8
+
+=head1 Sky
+
+=head2 About Sky
+
+Sky aims to be a convenient wrapper around
+L<rsync|http://en.wikipedia.org/wiki/Rsync> or a similar uploader, that
+allows one to upload files to a remote host and in exchange get the resultant
+URL from which other people can download the share files.
+
+For example, if you do from the command line:
+
+    $ sky --to=video Shine4U.webm
+
+Then sky will call:
+
+    rsync -a -v --progress --inplace Shine4U.webm homepage:public_html/share-dir/video/
+
+And afterwards display the following URL for copy+paste:
+
+    http://www.my-home-page.tld/share-dir/video/Shine4U.webm
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut
