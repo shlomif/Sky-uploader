@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 use Test::Differences (qw( eq_or_diff ));
 
@@ -12,7 +12,7 @@ use App::Sky::Module;
 {
     my $m = App::Sky::Module->new(
         {
-            upload_cmd => [qw(rsync -a -v --progress --inplace)],
+            base_upload_cmd => [qw(rsync -a -v --progress --inplace)],
             dest_upload_prefix => 'hostgator:public_html/',
             dest_upload_url => 'http://www.shlomifish.org/',
         }
@@ -23,19 +23,26 @@ use App::Sky::Module;
 
     # TEST
     eq_or_diff(
-        $m->upload_cmd(),
+        $m->base_upload_cmd(),
         [qw(rsync -a -v --progress --inplace)],
-        "upload_cmd was set.",
+        "base_upload_cmd was set.",
     );
 
     my $results = $m->get_upload_results(
         {
-            'file' => 'Shine4U.webm',
+            'filenames' => ['Shine4U.webm'],
             'target_dir' => 'Files/files/video/',
         }
     );
 
     # TEST
     ok ($results, "Results were returned.");
+
+    # TEST
+    eq_or_diff (
+        $results->{upload_cmd},
+        [qw(rsync -a -v --progress --inplace Shine4U.webm hostgator:public_html/Files/files/video/)],
+        "upload_cmd is sane",
+    );
 }
 
