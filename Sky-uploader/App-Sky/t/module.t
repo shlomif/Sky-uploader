@@ -45,12 +45,13 @@ use App::Sky::Module;
         "results->upload_cmd() is correct.",
     );
 
-    my $url = $results->urls->[0];
-
     # TEST
-    is ($url->as_string(),
-        'http://www.shlomifish.org/Files/files/video/Shine4U.webm',
-        'URI is correct.',
+    eq_or_diff (
+        [map { $_->as_string() } @{$results->urls()}],
+        [
+            'http://www.shlomifish.org/Files/files/video/Shine4U.webm',
+        ],
+        'The result URLs are correct.',
     )
 }
 
