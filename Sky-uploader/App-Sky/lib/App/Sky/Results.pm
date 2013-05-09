@@ -13,16 +13,23 @@ App::Sky::Results - results of an upload.
 
 use Carp ();
 
+use URI;
+
 use Moo;
 use MooX 'late';
 
 has upload_cmd => (isa => 'ArrayRef[Str]', is => 'ro',);
+has urls => (isa => 'ArrayRef[URI]', is => 'ro',);
 
 =head1 METHODS
 
-=head2 $sky->upload_cmd()
+=head2 $results->upload_cmd()
 
 The upload command to execute.
+
+=head2 $results->urls()
+
+An array reference of L<URI> objects where the files were uploaded to.
 
 =cut
 

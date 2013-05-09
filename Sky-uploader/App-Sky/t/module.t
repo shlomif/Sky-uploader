@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 use Test::Differences (qw( eq_or_diff ));
 
@@ -14,7 +14,7 @@ use App::Sky::Module;
         {
             base_upload_cmd => [qw(rsync -a -v --progress --inplace)],
             dest_upload_prefix => 'hostgator:public_html/',
-            dest_upload_url => 'http://www.shlomifish.org/',
+            dest_upload_url_prefix => 'http://www.shlomifish.org/',
         }
     );
 
@@ -44,5 +44,13 @@ use App::Sky::Module;
         [qw(rsync -a -v --progress --inplace Shine4U.webm hostgator:public_html/Files/files/video/)],
         "results->upload_cmd() is correct.",
     );
+
+    my $url = $results->urls->[0];
+
+    # TEST
+    is ($url->as_string(),
+        'http://www.shlomifish.org/Files/files/video/Shine4U.webm',
+        'URI is correct.',
+    )
 }
 
