@@ -40,9 +40,9 @@ use App::Sky::Module;
 
     # TEST
     eq_or_diff (
-        $results->{upload_cmd},
+        $results->upload_cmd(),
         [qw(rsync -a -v --progress --inplace Shine4U.webm hostgator:public_html/Files/files/video/)],
-        "upload_cmd is sane",
+        "results->upload_cmd() is correct.",
     );
 }
 

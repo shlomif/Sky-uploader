@@ -16,6 +16,8 @@ use Carp ();
 use Moo;
 use MooX 'late';
 
+use App::Sky::Results;
+
 has base_upload_cmd => (isa => 'ArrayRef[Str]', is => 'ro',);
 has dest_upload_prefix => (isa => 'Str', is => 'ro',);
 
@@ -41,7 +43,7 @@ The upload prefix to upload to. So:
 
 Gives the recipe to execute for the upload commands.
 
-Returns a results hash reference containing:
+Returns a L<App::Sky::Results> reference containing:
 
 =over 4
 
@@ -68,15 +70,16 @@ sub get_upload_results
     my $target_dir = $args->{target_dir}
         or Carp::confess ("Missing argument 'target_dir'");
 
-    return
-    {
-        upload_cmd =>
-        [
-            @{$self->base_upload_cmd()},
-            @$filenames,
-            ($self->dest_upload_prefix() . $target_dir),
-        ],
-    };
+    return App::Sky::Results->new(
+        {
+            upload_cmd =>
+            [
+                @{$self->base_upload_cmd()},
+                @$filenames,
+                ($self->dest_upload_prefix() . $target_dir),
+            ],
+        }
+    );
 }
 
 
