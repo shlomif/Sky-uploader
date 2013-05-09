@@ -17,6 +17,7 @@ use Moo;
 use MooX 'late';
 
 use URI;
+use File::Basename qw(basename);
 
 use App::Sky::Results;
 
@@ -90,8 +91,7 @@ sub get_upload_results
                 URI->new(
                     $self->dest_upload_url_prefix()
                     . $target_dir
-                    # TODO : change to basename.
-                    . $filenames->[0]
+                    . basename($filenames->[0])
                 ),
             ],
         }

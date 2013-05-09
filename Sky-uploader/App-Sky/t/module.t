@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 8;
 
 use Test::Differences (qw( eq_or_diff ));
 
@@ -28,30 +28,60 @@ use App::Sky::Module;
         "base_upload_cmd was set.",
     );
 
-    my $results = $m->get_upload_results(
-        {
-            'filenames' => ['Shine4U.webm'],
-            'target_dir' => 'Files/files/video/',
-        }
-    );
+    {
+        my $results = $m->get_upload_results(
+            {
+                'filenames' => ['Shine4U.webm'],
+                'target_dir' => 'Files/files/video/',
+            }
+        );
 
-    # TEST
-    ok ($results, "Results were returned.");
+        # TEST
+        ok ($results, "Results were returned.");
 
-    # TEST
-    eq_or_diff (
-        $results->upload_cmd(),
-        [qw(rsync -a -v --progress --inplace Shine4U.webm hostgator:public_html/Files/files/video/)],
-        "results->upload_cmd() is correct.",
-    );
+        # TEST
+        eq_or_diff (
+            $results->upload_cmd(),
+            [qw(rsync -a -v --progress --inplace Shine4U.webm hostgator:public_html/Files/files/video/)],
+            "results->upload_cmd() is correct.",
+        );
 
-    # TEST
-    eq_or_diff (
-        [map { $_->as_string() } @{$results->urls()}],
-        [
-            'http://www.shlomifish.org/Files/files/video/Shine4U.webm',
-        ],
-        'The result URLs are correct.',
-    )
+        # TEST
+        eq_or_diff (
+            [map { $_->as_string() } @{$results->urls()}],
+            [
+                'http://www.shlomifish.org/Files/files/video/Shine4U.webm',
+            ],
+            'The result URLs are correct.',
+        );
+    }
+
+    {
+        my $results = $m->get_upload_results(
+            {
+                'filenames' => ['../../My-Lemon.webm'],
+                'target_dir' => 'Files/files/video/',
+            }
+        );
+
+        # TEST
+        ok ($results, "../../ Results were returned.");
+
+        # TEST
+        eq_or_diff (
+            $results->upload_cmd(),
+            [qw(rsync -a -v --progress --inplace ../../My-Lemon.webm hostgator:public_html/Files/files/video/)],
+            "../../ results->upload_cmd() is correct.",
+        );
+
+        # TEST
+        eq_or_diff (
+            [map { $_->as_string() } @{$results->urls()}],
+            [
+                'http://www.shlomifish.org/Files/files/video/My-Lemon.webm',
+            ],
+            'URLs for using basename.',
+        );
+    }
 }
 
