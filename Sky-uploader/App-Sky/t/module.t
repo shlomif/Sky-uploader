@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8;
+use Test::More tests => 11;
 
 use Test::Differences (qw( eq_or_diff ));
 
@@ -83,5 +83,34 @@ use App::Sky::Module;
             'URLs for using basename.',
         );
     }
+
+    {
+        my $results = $m->get_upload_results(
+            {
+                'filenames' => ['/home/shlomif/progs/perl/MetaData.pm'],
+                'target_dir' => 'share-dir/code/',
+            }
+        );
+
+        # TEST
+        ok ($results, "Absolute URL - results obj was returned.");
+
+        # TEST
+        eq_or_diff (
+            $results->upload_cmd(),
+            [qw(rsync -a -v --progress --inplace /home/shlomif/progs/perl/MetaData.pm hostgator:public_html/share-dir/code/)],
+            "Absolute URL - results->upload_cmd() is correct.",
+        );
+
+        # TEST
+        eq_or_diff (
+            [map { $_->as_string() } @{$results->urls()}],
+            [
+                'http://www.shlomifish.org/share-dir/code/MetaData.pm',
+            ],
+            'Absolute URL - URLs for using basename.',
+        );
+    }
+
 }
 
