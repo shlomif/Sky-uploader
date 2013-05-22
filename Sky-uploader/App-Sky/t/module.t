@@ -3,11 +3,12 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 14;
 
 use Test::Differences (qw( eq_or_diff ));
 
 use App::Sky::Module;
+use App::Sky::Exception;
 
 {
     my $m = App::Sky::Module->new(
@@ -114,3 +115,42 @@ use App::Sky::Module;
 
 }
 
+{
+    my $m = App::Sky::Module->new(
+        {
+            base_upload_cmd => [qw(rsync -a -v --progress --inplace)],
+            dest_upload_prefix => 'shlomif@perl-begin.org:sites/perl-begin',
+            dest_upload_url_prefix => 'http://perl-begin.org/',
+        }
+    );
+
+    {
+        eval
+        {
+            my $results = $m->get_upload_results(
+                {
+                    'filenames' => ['/home/shlomif/progs/foo:bar.pm'],
+                    'target_dir' => 'Files/files/code/',
+                }
+            );
+        };
+
+        my $E = $@;
+
+        # TEST
+        ok ($E, 'An exception was thrown.');
+
+        # TEST
+        isa_ok ($E, 'App::Sky::Exception::Upload::Filename::InvalidChars',
+            'Exception is right.'
+        );
+
+        # TEST
+        eq_or_diff
+        (
+            $E->invalid_chars(),
+            [':'],
+            "Invalid characters is fine.",
+        );
+    }
+}

@@ -19,7 +19,10 @@ use MooX 'late';
 use URI;
 use File::Basename qw(basename);
 
+use List::MoreUtils qw( uniq );
+
 use App::Sky::Results;
+use App::Sky::Exception;
 
 has base_upload_cmd => (isa => 'ArrayRef[Str]', is => 'ro',);
 has dest_upload_prefix => (isa => 'Str', is => 'ro',);
@@ -77,6 +80,18 @@ sub get_upload_results
 
     my $target_dir = $args->{target_dir}
         or Carp::confess ("Missing argument 'target_dir'");
+
+    my $invalid_chars_re = qr/[:]/;
+
+    my @invalid_chars = (map { split( //, $_) } map { /($invalid_chars_re)/g } @$filenames);
+
+    if (@invalid_chars)
+    {
+        App::Sky::Exception::Upload::Filename::InvalidChars->throw(
+            invalid_chars =>
+            [sort { $a cmp $b } uniq(@invalid_chars)],
+        );
+    }
 
     return App::Sky::Results->new(
         {
