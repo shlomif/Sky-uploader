@@ -5,6 +5,8 @@ use warnings;
 
 our $VERSION = '0.0.1';
 
+=encoding utf8
+
 =head1 NAME
 
 App::Sky::Manager - manager for the configuration.
@@ -34,6 +36,23 @@ The configuration of the app as passed through the configuration file.
 =head2 my $results = $sky->get_upload_results({ filenames => ["Shine4U.webm"], });
 
 Gives the recipe to execute for the upload commands.
+
+Accepts one argument that is a hash reference with these keys:
+
+=over 4
+
+=item * 'filenames'
+
+An array reference containing strings to upload. Currently only supports
+one filename.
+
+=item * 'section'
+
+An optional section that will override the target section. If not specified,
+the uploader will try to guess based on the file’s basename and the manager
+configuration.
+
+=back
 
 Returns a L<App::Sky::Results> reference containing:
 
@@ -75,13 +94,24 @@ sub get_upload_results
     my $bn = basename($fn);
 
     my $sections = $site_conf->{sections};
-    my $sect_name = (first {
-        my $re = $sections->{$_}->{basename_re};
-        $fn =~ /$re/ } (keys(%$sections)) );
+
+    my $sect_name = $args->{section};
+
+    if (!defined ($sect_name) )
+    {
+        $sect_name = (first {
+                my $re = $sections->{$_}->{basename_re};
+                $fn =~ /$re/ } (keys(%$sections)) );
+    }
 
     if (!defined( $sect_name ))
     {
         Carp::confess ("Unknown section for basename '$bn'");
+    }
+
+    if (!exists( $sections->{$sect_name} ))
+    {
+        Carp::confess ("Section '$sect_name' does not exist.");
     }
 
     return $backend->get_upload_results(

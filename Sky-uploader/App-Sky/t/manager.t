@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 13;
 
 use Test::Differences (qw( eq_or_diff ));
 
@@ -153,6 +153,27 @@ package main;
             ],
         },
         'test-code.c',
+    );
+
+    # TEST*$test_upload_results
+    $tester->test_upload_results(
+        {
+            input =>
+            {
+                'section' => 'music',
+                'filenames' => ['/home/music/Music/mp3s/Shine 4U - Carmen and Camille-B8ehY5tutHs.mp4', ],
+            },
+            upload_cmd =>
+            [qw(rsync -a -v --progress --inplace),
+            '/home/music/Music/mp3s/Shine 4U - Carmen and Camille-B8ehY5tutHs.mp4',
+            'hostgator:public_html/Files/files/music/mp3-ogg/',
+            ],
+            urls =>
+            [
+                'http://www.shlomifish.org/Files/files/music/mp3-ogg/Shine%204U%20-%20Carmen%20and%20Camille-B8ehY5tutHs.mp4',
+            ],
+        },
+        '.mp4 file to music section.',
     );
 }
 
