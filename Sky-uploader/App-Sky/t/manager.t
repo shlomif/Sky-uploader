@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 10;
 
 use Test::Differences (qw( eq_or_diff ));
 
@@ -133,6 +133,26 @@ package main;
             ],
         },
         'MyModule.pm',
+    );
+
+    # TEST*$test_upload_results
+    $tester->test_upload_results(
+        {
+            input =>
+            {
+                'filenames' => ['/var/tmp/test-code.c'],
+            },
+            upload_cmd =>
+            [qw(rsync -a -v --progress --inplace),
+                '/var/tmp/test-code.c',
+                'hostgator:public_html/Files/files/code/'
+            ],
+            urls =>
+            [
+                'http://www.shlomifish.org/Files/files/code/test-code.c',
+            ],
+        },
+        'test-code.c',
     );
 }
 
