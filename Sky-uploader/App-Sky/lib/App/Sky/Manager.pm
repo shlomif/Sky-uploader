@@ -33,6 +33,54 @@ has config => (isa => 'HashRef', is => 'ro',);
 
 The configuration of the app as passed through the configuration file.
 
+=cut
+
+sub _calc_site_conf
+{
+    my ($self, $args) = @_;
+
+    my $config = $self->config;
+
+    return $config->{sites}->{ $config->{default_site} };
+}
+
+sub _calc_target_dir
+{
+    my ($self, $args) = @_;
+
+    if (defined( $args->{target_dir} ))
+    {
+        return $args->{target_dir};
+    }
+    else
+    {
+        my $bn = $args->{basename};
+
+        my $sections = $self->_calc_site_conf($args)->{sections};
+
+        my $sect_name = $args->{section};
+
+        if (!defined ($sect_name) )
+        {
+            $sect_name = (first {
+                    my $re = $sections->{$_}->{basename_re};
+                    $bn =~ /$re/ } (keys(%$sections)) );
+        }
+
+        if (!defined( $sect_name ))
+        {
+            Carp::confess ("Unknown section for basename '$bn'");
+        }
+
+        if (!exists( $sections->{$sect_name} ))
+        {
+            Carp::confess ("Section '$sect_name' does not exist.");
+        }
+
+        return $sections->{$sect_name}->{target_dir};
+    }
+}
+
 =head2 my $results = $sky->get_upload_results({ filenames => ["Shine4U.webm"], });
 
 Gives the recipe to execute for the upload commands.
@@ -83,9 +131,7 @@ sub get_upload_results
         Carp::confess ("More than one file passed to 'filenames'");
     }
 
-    my $config = $self->config;
-
-    my $site_conf = $config->{sites}->{ $config->{default_site} };
+    my $site_conf = $self->_calc_site_conf($args);
 
     my $backend = App::Sky::Module->new(
         {
@@ -98,42 +144,13 @@ sub get_upload_results
     my $fn = $filenames->[0];
     my $bn = basename($fn);
 
-    my $target_dir;
-
-    if (defined( $args->{target_dir} ))
-    {
-        $target_dir = $args->{target_dir};
-    }
-    else
-    {
-        my $sections = $site_conf->{sections};
-
-        my $sect_name = $args->{section};
-
-        if (!defined ($sect_name) )
-        {
-            $sect_name = (first {
-                    my $re = $sections->{$_}->{basename_re};
-                    $fn =~ /$re/ } (keys(%$sections)) );
-        }
-
-        if (!defined( $sect_name ))
-        {
-            Carp::confess ("Unknown section for basename '$bn'");
-        }
-
-        if (!exists( $sections->{$sect_name} ))
-        {
-            Carp::confess ("Section '$sect_name' does not exist.");
-        }
-
-        $target_dir = $sections->{$sect_name}->{target_dir};
-    }
-
     return $backend->get_upload_results(
         {
             filenames => $filenames,
-            target_dir => $target_dir,
+            target_dir => $self->_calc_target_dir({
+                    %$args,
+                    basename => $bn,
+            }),
         }
     );
 }
