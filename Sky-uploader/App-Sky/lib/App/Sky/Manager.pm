@@ -52,6 +52,11 @@ An optional section that will override the target section. If not specified,
 the uploader will try to guess based on the file’s basename and the manager
 configuration.
 
+=item * 'target_dir'
+
+Overrides the target directory for the upload, to ignore that dictated by
+the sections. Should point to a string.
+
 =back
 
 Returns a L<App::Sky::Results> reference containing:
@@ -93,31 +98,42 @@ sub get_upload_results
     my $fn = $filenames->[0];
     my $bn = basename($fn);
 
-    my $sections = $site_conf->{sections};
+    my $target_dir;
 
-    my $sect_name = $args->{section};
-
-    if (!defined ($sect_name) )
+    if (defined( $args->{target_dir} ))
     {
-        $sect_name = (first {
-                my $re = $sections->{$_}->{basename_re};
-                $fn =~ /$re/ } (keys(%$sections)) );
+        $target_dir = $args->{target_dir};
     }
-
-    if (!defined( $sect_name ))
+    else
     {
-        Carp::confess ("Unknown section for basename '$bn'");
-    }
+        my $sections = $site_conf->{sections};
 
-    if (!exists( $sections->{$sect_name} ))
-    {
-        Carp::confess ("Section '$sect_name' does not exist.");
+        my $sect_name = $args->{section};
+
+        if (!defined ($sect_name) )
+        {
+            $sect_name = (first {
+                    my $re = $sections->{$_}->{basename_re};
+                    $fn =~ /$re/ } (keys(%$sections)) );
+        }
+
+        if (!defined( $sect_name ))
+        {
+            Carp::confess ("Unknown section for basename '$bn'");
+        }
+
+        if (!exists( $sections->{$sect_name} ))
+        {
+            Carp::confess ("Section '$sect_name' does not exist.");
+        }
+
+        $target_dir = $sections->{$sect_name}->{target_dir};
     }
 
     return $backend->get_upload_results(
         {
             filenames => $filenames,
-            target_dir => $sections->{$sect_name}->{target_dir},
+            target_dir => $target_dir,
         }
     );
 }
