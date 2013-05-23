@@ -3,11 +3,55 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 10;
 
 use Test::Differences (qw( eq_or_diff ));
 
 use App::Sky::Manager;
+
+package ManagerTester;
+
+use MooX qw/late/;
+
+use Test::More;
+
+use Test::Differences (qw( eq_or_diff ));
+
+has 'manager' => (isa => 'App::Sky::Manager', is => 'ro');
+
+# TEST:$c=0;
+sub test_upload_results
+{
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my ($self, $args, $blurb_base) = @_;
+
+    my $results = $self->manager->get_upload_results(
+        $args->{input}
+    );
+
+    # TEST:$c++
+    ok ($results, "$blurb_base - Results were returned.");
+
+    # TEST:$c++
+    eq_or_diff (
+        $results->upload_cmd(),
+        $args->{upload_cmd},
+        "$blurb_base - results->upload_cmd() is correct.",
+    );
+
+    # TEST:$c++
+    eq_or_diff (
+        [map { $_->as_string() } @{$results->urls()}],
+        $args->{urls},
+        "$blurb_base - the result URLs are correct.",
+    );
+
+    return;
+}
+
+# TEST:$test_upload_results=$c;
+
+package main;
 
 {
     my $manager = App::Sky::Manager->new(
@@ -79,6 +123,27 @@ use App::Sky::Manager;
         );
     }
 
+    my $tester = ManagerTester->new({ manager => $manager });
+
+    # TEST*$test_upload_results
+    $tester->test_upload_results(
+        {
+            input =>
+            {
+                'filenames' => ['./foobar/MyModule.pm'],
+            },
+            upload_cmd =>
+            [qw(rsync -a -v --progress --inplace),
+                './foobar/MyModule.pm',
+                'hostgator:public_html/Files/files/code/'
+            ],
+            urls =>
+            [
+                'http://www.shlomifish.org/Files/files/code/MyModule.pm',
+            ],
+        },
+        'MyModule.pm',
+    );
     {
         my $results = $manager->get_upload_results(
             {
