@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 7;
 
 use Test::Differences (qw( eq_or_diff ));
 
@@ -144,34 +144,5 @@ package main;
         },
         'MyModule.pm',
     );
-    {
-        my $results = $manager->get_upload_results(
-            {
-                'filenames' => ['./foobar/MyModule.pm'],
-            }
-        );
-
-        # TEST
-        ok ($results, "Results were returned.");
-
-        # TEST
-        eq_or_diff (
-            $results->upload_cmd(),
-            [qw(rsync -a -v --progress --inplace),
-            './foobar/MyModule.pm',
-            'hostgator:public_html/Files/files/code/'
-            ],
-            "[code] results->upload_cmd() is correct.",
-        );
-
-        # TEST
-        eq_or_diff (
-            [map { $_->as_string() } @{$results->urls()}],
-            [
-                'http://www.shlomifish.org/Files/files/code/MyModule.pm',
-            ],
-            'code - the result URLs are correct.',
-        );
-    }
 }
 
