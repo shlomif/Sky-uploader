@@ -93,37 +93,27 @@ package main;
     # TEST
     ok ($manager, 'Module App::Sky::Manager was created.');
 
-    {
-        my $results = $manager->get_upload_results(
+    my $tester = ManagerTester->new({ manager => $manager });
+
+    # TEST*$test_upload_results
+    $tester->test_upload_results(
+        {
+            input =>
             {
                 'filenames' => ['/home/music/Music/mp3s/Shine 4U - Carmen and Camille-B8ehY5tutHs.mp4', ],
-            }
-        );
-
-        # TEST
-        ok ($results, "Results were returned.");
-
-        # TEST
-        eq_or_diff (
-            $results->upload_cmd(),
+            },
+            upload_cmd =>
             [qw(rsync -a -v --progress --inplace),
             '/home/music/Music/mp3s/Shine 4U - Carmen and Camille-B8ehY5tutHs.mp4',
             'hostgator:public_html/Files/files/video/'
             ],
-            "results->upload_cmd() is correct.",
-        );
-
-        # TEST
-        eq_or_diff (
-            [map { $_->as_string() } @{$results->urls()}],
+            urls =>
             [
                 'http://www.shlomifish.org/Files/files/video/Shine%204U%20-%20Carmen%20and%20Camille-B8ehY5tutHs.mp4',
             ],
-            'The result URLs are correct.',
-        );
-    }
-
-    my $tester = ManagerTester->new({ manager => $manager });
+        },
+        '[mp4 file]',
+    );
 
     # TEST*$test_upload_results
     $tester->test_upload_results(
