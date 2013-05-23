@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More tests => 7;
 
 use Test::Differences (qw( eq_or_diff ));
 
@@ -76,6 +76,36 @@ use App::Sky::Manager;
                 'http://www.shlomifish.org/Files/files/video/Shine%204U%20-%20Carmen%20and%20Camille-B8ehY5tutHs.mp4',
             ],
             'The result URLs are correct.',
+        );
+    }
+
+    {
+        my $results = $manager->get_upload_results(
+            {
+                'filenames' => ['./foobar/MyModule.pm'],
+            }
+        );
+
+        # TEST
+        ok ($results, "Results were returned.");
+
+        # TEST
+        eq_or_diff (
+            $results->upload_cmd(),
+            [qw(rsync -a -v --progress --inplace),
+            './foobar/MyModule.pm',
+            'hostgator:public_html/Files/files/code/'
+            ],
+            "[code] results->upload_cmd() is correct.",
+        );
+
+        # TEST
+        eq_or_diff (
+            [map { $_->as_string() } @{$results->urls()}],
+            [
+                'http://www.shlomifish.org/Files/files/code/MyModule.pm',
+            ],
+            'code - the result URLs are correct.',
         );
     }
 }
