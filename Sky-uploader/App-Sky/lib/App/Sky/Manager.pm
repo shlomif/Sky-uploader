@@ -44,6 +44,34 @@ sub _calc_site_conf
     return $config->{sites}->{ $config->{default_site} };
 }
 
+sub _calc_sect_name
+{
+    my ($self, $args, $sections) = @_;
+
+    my $bn = $args->{basename};
+
+    my $sect_name = $args->{section} //
+    (first
+        {
+            my $re = $sections->{$_}->{basename_re};
+            $bn =~ /$re/
+        }
+        (keys(%$sections))
+    );
+
+    if (!defined( $sect_name ))
+    {
+        Carp::confess ("Unknown section for basename '$bn'");
+    }
+
+    if (!exists( $sections->{$sect_name} ))
+    {
+        Carp::confess ("Section '$sect_name' does not exist.");
+    }
+
+    return $sect_name;
+}
+
 sub _calc_target_dir
 {
     my ($self, $args) = @_;
@@ -54,28 +82,9 @@ sub _calc_target_dir
     }
     else
     {
-        my $bn = $args->{basename};
-
         my $sections = $self->_calc_site_conf($args)->{sections};
 
-        my $sect_name = $args->{section};
-
-        if (!defined ($sect_name) )
-        {
-            $sect_name = (first {
-                    my $re = $sections->{$_}->{basename_re};
-                    $bn =~ /$re/ } (keys(%$sections)) );
-        }
-
-        if (!defined( $sect_name ))
-        {
-            Carp::confess ("Unknown section for basename '$bn'");
-        }
-
-        if (!exists( $sections->{$sect_name} ))
-        {
-            Carp::confess ("Section '$sect_name' does not exist.");
-        }
+        my $sect_name = $self->_calc_sect_name( $args, $sections );
 
         return $sections->{$sect_name}->{target_dir};
     }
