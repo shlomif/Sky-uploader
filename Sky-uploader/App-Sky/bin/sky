@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use App::Sky::CmdLine;
+
+App::Sky::CmdLine->new({argv => [@ARGV]})->run();
