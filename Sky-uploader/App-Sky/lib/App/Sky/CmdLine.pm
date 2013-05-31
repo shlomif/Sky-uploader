@@ -41,24 +41,44 @@ Run the application.
 
 =cut
 
+sub _basic_help
+{
+    my ($self) = @_;
+
+    print <<'EOF';
+sky upload /path/to/myfile.txt
+EOF
+
+    exit(0);
+}
+
+sub _basic_usage
+{
+    my ($self) = @_;
+
+    print "Usage: sky [up|upload] /path/to/myfile.txt\n";
+    exit(-1);
+}
+
 sub run
 {
     my ($self) = @_;
+
+    if (! @{$self->argv()})
+    {
+        return $self->_basic_usage();
+    }
 
     my $verb = shift(@{$self->argv()});
 
     if (($verb eq '--help') or ($verb eq '-h'))
     {
-        print <<'EOF';
-sky upload /path/to/myfile.txt
-EOF
-        exit(0);
+        return $self->_basic_help();
     }
 
     if (not (($verb eq 'up') || ($verb eq 'upload')))
     {
-        print "Usage: sky [up|upload] /path/to/myfile.txt";
-        exit(-1);
+        return $self->_basic_usage();
     }
 
     # GetOptionsFromArray(
