@@ -2,6 +2,7 @@ Revision history for App-Sky
 
 v0.0.2      2013-05-31
     - Add scripts/bump-version-number.pl .
+    - Correct the links in the resources and pages to the repositories/etc.
 
 v0.0.1      2013-05-31
     - First version, released on an unsuspecting world
