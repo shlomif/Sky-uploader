@@ -1,5 +1,9 @@
 Revision history for App-Sky
 
+v0.0.5      2013-06-02
+    - Remove *~ files from the distribution.
+        - Thanks to Kharec for noticing and reporting.
+
 v0.0.4      2013-06-02
     - Extract the lib/App/Sky/Config/Validate.pm class.
     - Some tests for it in t/config-validate.t .
