@@ -1,5 +1,10 @@
 Revision history for App-Sky
 
+v0.0.3      2013-06-02
+    - Add MooX::late to the pre-requisites.
+        - There were test failures:
+        - http://www.cpantesters.org/cpan/report/9b18aeb8-ca27-11e2-82d6-3b44989cd64d
+
 v0.0.2      2013-05-31
     - Add scripts/bump-version-number.pl .
     - Correct the links in the resources and pages to the repositories/etc.
