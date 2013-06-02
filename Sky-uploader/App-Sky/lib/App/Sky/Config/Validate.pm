@@ -19,6 +19,7 @@ use Moo;
 use MooX 'late';
 
 use Scalar::Util qw(reftype);
+use List::MoreUtils qw(notall);
 
 has 'config' => (isa => 'HashRef', is => 'ro', required => 1,);
 
@@ -73,6 +74,11 @@ sub _validate_site
     if (ref ($base_upload_cmd) ne 'ARRAY')
     {
         die "base_upload_cmd for site '$site_name' is not an array.";
+    }
+
+    if (notall { defined($_) && ref($_) eq '' } @$base_upload_cmd)
+    {
+        die "base_upload_cmd for site '$site_name' must contain only strings.";
     }
 
     foreach my $kk (qw(dest_upload_prefix dest_upload_url_prefix))
