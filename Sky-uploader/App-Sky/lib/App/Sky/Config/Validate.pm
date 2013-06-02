@@ -110,9 +110,9 @@ sub is_valid
             die "sites key must be a hash.";
         }
 
-        foreach my $k (_sorted_keys($sites))
+        foreach my $name (_sorted_keys($sites))
         {
-            $self->_validate_site($k, $sites->{$k});
+            $self->_validate_site($name, $sites->{$name});
         }
     }
 
