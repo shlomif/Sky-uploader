@@ -35,6 +35,13 @@ and returns FALSE (in both list context and scalar context if it is valid.).
 
 =cut
 
+sub _sorted_keys
+{
+    my $hash_ref = shift;
+
+    return sort {$a cmp $b } keys(%$hash_ref);
+}
+
 sub is_valid
 {
     my ($self) = @_;
@@ -54,7 +61,7 @@ sub is_valid
             die "sites key must be a hash.";
         }
 
-        foreach my $k (keys(%$sites))
+        foreach my $k (_sorted_keys($sites))
         {
             my $v = $sites->{$k};
 
@@ -85,7 +92,7 @@ sub is_valid
                 die "Sections for site '$k' is not a hash.";
             }
 
-            foreach my $sect_k (keys (%$sections))
+            foreach my $sect_k (_sorted_keys($sections))
             {
                 my $sect_v = $sections->{$sect_k};
 
