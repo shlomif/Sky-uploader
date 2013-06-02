@@ -42,6 +42,55 @@ sub _sorted_keys
     return sort {$a cmp $b } keys(%$hash_ref);
 }
 
+sub _validate_site
+{
+    my ($self, $site_name, $site_conf) = @_;
+
+    my $base_upload_cmd = $site_conf->{base_upload_cmd};
+    if (ref ($base_upload_cmd) ne 'ARRAY')
+    {
+        die "base_upload_cmd for site '$site_name' is not an array.";
+    }
+
+    foreach my $kk (qw(dest_upload_prefix dest_upload_url_prefix))
+    {
+        my $s = $site_conf->{$kk};
+        if (not
+            (
+                defined($s) && (ref($s) eq '') && ($s =~ m/./)
+            )
+        )
+        {
+            die "$kk for site '$site_name' is not a string.";
+        }
+    }
+
+
+
+    my $sections = $site_conf->{sections};
+    if (ref ($sections) ne 'HASH')
+    {
+        die "Sections for site '$site_name' is not a hash.";
+    }
+
+    foreach my $sect_k (_sorted_keys($sections))
+    {
+        my $sect_v = $sections->{$sect_k};
+
+        if (! defined($sect_v->{basename_re}) or ref($sect_v->{basename_re} ne ''))
+        {
+            die "Section '$sect_k' at site '$site_name' must contain a basename_re";
+        }
+
+        if (! defined($sect_v->{target_dir}) or ref($sect_v->{target_dir} ne ''))
+        {
+            die "Section '$sect_k' at site '$site_name' must contain a target_dir";
+        }
+    }
+
+    return;
+}
+
 sub is_valid
 {
     my ($self) = @_;
@@ -63,49 +112,7 @@ sub is_valid
 
         foreach my $k (_sorted_keys($sites))
         {
-            my $v = $sites->{$k};
-
-            my $base_upload_cmd = $v->{base_upload_cmd};
-            if (ref ($base_upload_cmd) ne 'ARRAY')
-            {
-                die "base_upload_cmd for site '$k' is not an array.";
-            }
-
-            foreach my $kk (qw(dest_upload_prefix dest_upload_url_prefix))
-            {
-                my $s = $v->{$kk};
-                if (not
-                    (
-                        defined($s) && (ref($s) eq '') && ($s =~ m/./)
-                    )
-                )
-                {
-                    die "$kk for site '$k' is not a string.";
-                }
-            }
-
-
-
-            my $sections = $v->{sections};
-            if (ref ($sections) ne 'HASH')
-            {
-                die "Sections for site '$k' is not a hash.";
-            }
-
-            foreach my $sect_k (_sorted_keys($sections))
-            {
-                my $sect_v = $sections->{$sect_k};
-
-                if (! defined($sect_v->{basename_re}) or ref($sect_v->{basename_re} ne ''))
-                {
-                    die "Section '$sect_k' at site '$k' must contain a basename_re";
-                }
-
-                if (! defined($sect_v->{target_dir}) or ref($sect_v->{target_dir} ne ''))
-                {
-                    die "Section '$sect_k' at site '$k' must contain a target_dir";
-                }
-            }
+            $self->_validate_site($k, $sites->{$k});
         }
     }
 
