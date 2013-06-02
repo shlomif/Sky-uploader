@@ -80,7 +80,7 @@ sub _validate_site
         my $s = $site_conf->{$kk};
         if (not
             (
-                defined($s) && (ref($s) eq '') && ($s =~ m/./)
+                defined($s) && (ref($s) eq '') && ($s =~ m/\S/)
             )
         )
         {
