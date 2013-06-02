@@ -1,5 +1,9 @@
 Revision history for App-Sky
 
+v0.0.4      2013-06-02
+    - Extract the lib/App/Sky/Config/Validate.pm class.
+    - Some tests for it in t/config-validate.t .
+
 v0.0.3      2013-06-02
     - Add MooX::late to the pre-requisites.
         - There were test failures:
