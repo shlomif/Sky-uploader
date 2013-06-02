@@ -42,6 +42,29 @@ sub _sorted_keys
     return sort {$a cmp $b } keys(%$hash_ref);
 }
 
+sub _validate_section
+{
+    my ($self, $site_name, $sect_name, $sect_conf) = @_;
+
+    foreach my $string_key (qw( basename_re target_dir))
+    {
+        my $v = $sect_conf->{$string_key};
+
+        if (not (
+                defined($v)
+                &&
+                ref($v) eq ''
+                &&
+                $v =~ /\S/
+            ))
+        {
+        die "Section '$sect_name' at site '$site_name' must contain a non-empty $string_key";
+        }
+    }
+
+    return;
+}
+
 sub _validate_site
 {
     my ($self, $site_name, $site_conf) = @_;
@@ -73,19 +96,11 @@ sub _validate_site
         die "Sections for site '$site_name' is not a hash.";
     }
 
-    foreach my $sect_k (_sorted_keys($sections))
+    foreach my $sect_name (_sorted_keys($sections))
     {
-        my $sect_v = $sections->{$sect_k};
-
-        if (! defined($sect_v->{basename_re}) or ref($sect_v->{basename_re} ne ''))
-        {
-            die "Section '$sect_k' at site '$site_name' must contain a basename_re";
-        }
-
-        if (! defined($sect_v->{target_dir}) or ref($sect_v->{target_dir} ne ''))
-        {
-            die "Section '$sect_k' at site '$site_name' must contain a target_dir";
-        }
+        $self->_validate_section(
+            $site_name, $sect_name, $sections->{$sect_name}
+        );
     }
 
     return;
