@@ -20,6 +20,7 @@ use MooX 'late';
 
 use Getopt::Long qw(GetOptionsFromArray);
 
+use App::Sky::Config::Validate;
 use App::Sky::Manager;
 use File::HomeDir;
 
@@ -93,72 +94,8 @@ sub run
 
     my $config = LoadFile($config_fn);
 
-    # Validate the configuration
-    {
-        if (! exists ($config->{default_site}))
-        {
-            die "A 'default_site' key must be present in the configuration.";
-        }
-
-        my $sites = $config->{sites};
-        if (ref($sites) ne 'HASH')
-        {
-            die "sites key must be a hash.";
-        }
-
-        foreach my $k (keys(%$sites))
-        {
-            my $v = $sites->{$k};
-
-            my $base_upload_cmd = $v->{base_upload_cmd};
-            if (ref ($base_upload_cmd) ne 'ARRAY')
-            {
-                die "base_upload_cmd for site '$k' is not an array.";
-            }
-
-            foreach my $kk (qw(dest_upload_prefix dest_upload_url_prefix))
-            {
-                my $s = $v->{$kk};
-                if (not
-                    (
-                        defined($s) && (ref($s) eq '') && ($s =~ m/./)
-                    )
-                )
-                {
-                    die "$kk for site '$k' is not a string.";
-                }
-            }
-
-
-
-            my $sections = $v->{sections};
-            if (ref ($sections) ne 'HASH')
-            {
-                die "Sections for site '$k' is not a hash.";
-            }
-
-            foreach my $sect_k (keys (%$sections))
-            {
-                my $sect_v = $sections->{$sect_k};
-
-                if (! defined($sect_v->{basename_re}) or ref($sect_v->{basename_re} ne ''))
-                {
-                    die "Section '$sect_k' at site '$k' must contain a basename_re";
-                }
-
-                if (! defined($sect_v->{target_dir}) or ref($sect_v->{target_dir} ne ''))
-                {
-                    die "Section '$sect_k' at site '$k' must contain a target_dir";
-                }
-            }
-        }
-
-    }
-
-    if (reftype($config) ne 'HASH')
-    {
-        die "Must be a valid App-Sky configuration in '$config_fn'. Please see perldoc App::Sky for details.";
-    }
+    my $validator = App::Sky::Config::Validate->new({ config => $config });
+    $validator->is_valid();
 
     my $manager = App::Sky::Manager->new(
         {
