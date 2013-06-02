@@ -3,7 +3,7 @@ package App::Sky::Config::Validate;
 use strict;
 use warnings;
 
-our $VERSION = '0.0.4';
+our $VERSION = '0.0.5';
 
 =encoding utf8
 
