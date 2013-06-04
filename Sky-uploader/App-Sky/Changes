@@ -1,5 +1,9 @@
 Revision history for App-Sky
 
+v0.0.6      2013-06-04
+    - Made minimal version of perl 5.010 due to use of defined-or.
+        - it failed on perl-5.8.9.
+
 v0.0.5      2013-06-02
     - Remove *~ files from the distribution.
         - Thanks to Kharec for noticing and reporting.

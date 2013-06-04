@@ -25,6 +25,9 @@ use File::Basename qw(basename);
 
 use App::Sky::Module;
 
+# For defined-or - "//".
+use 5.010;
+
 has config => (isa => 'HashRef', is => 'ro',);
 
 =head1 METHODS
@@ -54,7 +57,7 @@ sub _calc_sect_name
     (first
         {
             my $re = $sections->{$_}->{basename_re};
-            $bn =~ /$re/
+            $bn =~ /$re/;
         }
         (keys(%$sections))
     );
