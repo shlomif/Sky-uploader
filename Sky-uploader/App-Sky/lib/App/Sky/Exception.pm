@@ -11,7 +11,7 @@ App::Sky::Exception - provides various exception classes for App::Sky
 
 use vars qw($VERSION);
 
-$VERSION = '0.0.6';
+$VERSION = '0.0.7';
 
 use Exception::Class (
     'App::Sky::Exception',
