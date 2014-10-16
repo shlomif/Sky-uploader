@@ -105,6 +105,47 @@ sub _calc_target_dir
     }
 }
 
+sub _perform_upload_generic
+{
+    my ($self, $is_dir, $args) = @_;
+
+    my $filenames = $args->{filenames}
+        or Carp::confess ("Missing argument 'filenames'");
+
+    if (@$filenames != 1)
+    {
+        Carp::confess ("More than one file passed to 'filenames'");
+    }
+
+    my $site_conf = $self->_calc_site_conf($args);
+
+    my $backend = App::Sky::Module->new(
+        {
+            base_upload_cmd => $site_conf->{base_upload_cmd},
+            dest_upload_prefix => $site_conf->{dest_upload_prefix},
+            dest_upload_url_prefix => $site_conf->{dest_upload_url_prefix},
+        }
+    );
+
+    my $fn = $filenames->[0];
+    my $bn = basename($fn);
+
+    my @dir = ($is_dir ? (is_dir => 1) : ());
+
+    return $backend->get_upload_results(
+        {
+            filenames => $filenames,
+            target_dir => $self->_calc_target_dir({
+                    %$args,
+                    basename => $bn,
+                    @dir,
+            }),
+            @dir,
+        }
+    );
+
+}
+
 =head2 my $results = $sky->get_upload_results({ filenames => ["Shine4U.webm"], });
 
 Gives the recipe to execute for the upload commands.
@@ -147,36 +188,7 @@ sub get_upload_results
 {
     my ($self, $args) = @_;
 
-    my $filenames = $args->{filenames}
-        or Carp::confess ("Missing argument 'filenames'");
-
-    if (@$filenames != 1)
-    {
-        Carp::confess ("More than one file passed to 'filenames'");
-    }
-
-    my $site_conf = $self->_calc_site_conf($args);
-
-    my $backend = App::Sky::Module->new(
-        {
-            base_upload_cmd => $site_conf->{base_upload_cmd},
-            dest_upload_prefix => $site_conf->{dest_upload_prefix},
-            dest_upload_url_prefix => $site_conf->{dest_upload_url_prefix},
-        }
-    );
-
-    my $fn = $filenames->[0];
-    my $bn = basename($fn);
-
-    return $backend->get_upload_results(
-        {
-            filenames => $filenames,
-            target_dir => $self->_calc_target_dir({
-                    %$args,
-                    basename => $bn,
-            }),
-        }
-    );
+    return $self->_perform_upload_generic(0, $args);
 }
 
 =head2 my $results = $sky->get_recursive_upload_results({ filenames => ['/home/music/Music/mp3s/Basic Desire/'], });
@@ -215,42 +227,12 @@ The upload command to execute (as an array reference of strings).
 =back
 
 =cut
+
 sub get_recursive_upload_results
 {
     my ($self, $args) = @_;
 
-    my $filenames = $args->{filenames}
-        or Carp::confess ("Missing argument 'filenames'");
-
-    if (@$filenames != 1)
-    {
-        Carp::confess ("More than one file passed to 'filenames'");
-    }
-
-    my $site_conf = $self->_calc_site_conf($args);
-
-    my $backend = App::Sky::Module->new(
-        {
-            base_upload_cmd => $site_conf->{base_upload_cmd},
-            dest_upload_prefix => $site_conf->{dest_upload_prefix},
-            dest_upload_url_prefix => $site_conf->{dest_upload_url_prefix},
-        }
-    );
-
-    my $fn = $filenames->[0];
-    my $bn = basename($fn);
-
-    return $backend->get_upload_results(
-        {
-            filenames => $filenames,
-            target_dir => $self->_calc_target_dir({
-                    %$args,
-                    basename => $bn,
-                    is_dir => 1,
-            }),
-            is_dir => 1,
-        }
-    );
+    return $self->_perform_upload_generic(1, $args);
 }
 
 

@@ -1,3 +1,6 @@
+DONE:
+-----
+
 * Merge the duplicate code between up and up-r in lib/App/Sky/Manager.pm .
 
 * Merge the duplicate code between up and up-r in lib/App/Sky/CmdLine.pm .
