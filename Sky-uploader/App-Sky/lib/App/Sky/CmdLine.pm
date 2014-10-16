@@ -110,57 +110,45 @@ sub run
         exit(0);
     };
 
+    my $op;
     if ((($verb eq 'up') || ($verb eq 'upload')))
     {
-        # GetOptionsFromArray(
-        #     $self->argv(),
-        # );
-
-        my $filename = shift(@{$self->argv()});
-
-        if (! -f $filename)
-        {
-            die "Can only upload files. '$filename' is not a valid filename.";
-        }
-
-        $_handle_results->(
-            scalar(
-                $_calc_manager->()->get_upload_results(
-                    {
-                        filenames => [$filename],
-                    }
-                )
-            )
-        );
-
+        $op = 'upload';
     }
     elsif (($verb eq 'up-r') || ($verb eq 'upload-recursive'))
     {
-        # GetOptionsFromArray(
-        #     $self->argv(),
-        # );
-
-        my $filename = shift(@{$self->argv()});
-
-        if (! -d $filename)
-        {
-            die "Can only upload directories. '$filename' is not a valid directory name.";
-        }
-
-        $_handle_results->(
-            scalar(
-                $_calc_manager->()->get_recursive_upload_results(
-                    {
-                        filenames => [$filename],
-                    }
-                )
-            )
-        );
+        $op = "up-r";
     }
     else
     {
         return $self->_basic_usage();
     }
+
+
+    # GetOptionsFromArray(
+    #     $self->argv(),
+    # );
+
+    my $filename = shift(@{$self->argv()});
+
+    if (not (($op eq 'upload') ? (-f $filename) : (-d $filename)))
+    {
+        die "Can only upload directories. '$filename' is not a valid directory name.";
+    }
+
+    my $meth = $op eq 'upload' ? 'get_upload_results' : 'get_recursive_upload_results';
+
+    $_handle_results->(
+        scalar(
+            $_calc_manager->()->$meth(
+                {
+                    filenames => [$filename],
+                }
+            )
+        )
+    );
+
+    return;
 }
 
 1;

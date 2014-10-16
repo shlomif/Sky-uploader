@@ -1,5 +1,8 @@
 Revision history for App-Sky
 
+v0.2.0      2014-10-16
+    - Add the "up-r" sub-command to upload sub-dirs.
+
 v0.0.7      2014-02-02
     - Fix the =encoding directives globally.
         - Single UTF-8 one.
