@@ -77,14 +77,7 @@ sub run
         return $self->_basic_help();
     }
 
-    if ((($verb eq 'up') || ($verb eq 'upload')))
-    {
-        # GetOptionsFromArray(
-        #     $self->argv(),
-        # );
-
-        my $filename = shift(@{$self->argv()});
-
+    my $_calc_manager = sub {
         my $dist_config_dir = File::HomeDir->my_dist_config( 'App-Sky', {create => 1}, );
 
         my $config_fn = File::Spec->catfile($dist_config_dir, 'app_sky_conf.yml');
@@ -94,11 +87,20 @@ sub run
         my $validator = App::Sky::Config::Validate->new({ config => $config });
         $validator->is_valid();
 
-        my $manager = App::Sky::Manager->new(
+        return App::Sky::Manager->new(
             {
                 config => $config,
             }
         );
+    };
+
+    if ((($verb eq 'up') || ($verb eq 'upload')))
+    {
+        # GetOptionsFromArray(
+        #     $self->argv(),
+        # );
+
+        my $filename = shift(@{$self->argv()});
 
         if (! -f $filename)
         {
@@ -106,7 +108,7 @@ sub run
         }
 
         my $results =
-        $manager->get_upload_results(
+        $_calc_manager->()->get_upload_results(
             {
                 filenames => [$filename],
             }
@@ -132,28 +134,13 @@ sub run
 
         my $filename = shift(@{$self->argv()});
 
-        my $dist_config_dir = File::HomeDir->my_dist_config( 'App-Sky', {create => 1}, );
-
-        my $config_fn = File::Spec->catfile($dist_config_dir, 'app_sky_conf.yml');
-
-        my $config = LoadFile($config_fn);
-
-        my $validator = App::Sky::Config::Validate->new({ config => $config });
-        $validator->is_valid();
-
-        my $manager = App::Sky::Manager->new(
-            {
-                config => $config,
-            }
-        );
-
         if (! -d $filename)
         {
             die "Can only upload directories. '$filename' is not a valid directory name.";
         }
 
         my $results =
-        $manager->get_recursive_upload_results(
+        $_calc_manager->()->get_recursive_upload_results(
             {
                 filenames => [$filename],
             }
