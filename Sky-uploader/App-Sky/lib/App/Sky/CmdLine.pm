@@ -94,6 +94,22 @@ sub run
         );
     };
 
+    my $_handle_results = sub {
+        my ($results) = @_;
+
+        my $upload_cmd = $results->upload_cmd();
+        my $urls = $results->urls();
+
+        if ((system { $upload_cmd->[0] } @$upload_cmd) != 0)
+        {
+            die "Upload cmd <<@$upload_cmd>> failed with $!";
+        }
+
+        print "Got URL:\n" , $urls->[0]->as_string(), "\n";
+
+        exit(0);
+    };
+
     if ((($verb eq 'up') || ($verb eq 'upload')))
     {
         # GetOptionsFromArray(
@@ -107,24 +123,16 @@ sub run
             die "Can only upload files. '$filename' is not a valid filename.";
         }
 
-        my $results =
-        $_calc_manager->()->get_upload_results(
-            {
-                filenames => [$filename],
-            }
+        $_handle_results->(
+            scalar(
+                $_calc_manager->()->get_upload_results(
+                    {
+                        filenames => [$filename],
+                    }
+                )
+            )
         );
 
-        my $upload_cmd = $results->upload_cmd();
-        my $urls = $results->urls();
-
-        if ((system { $upload_cmd->[0] } @$upload_cmd) != 0)
-        {
-            die "Upload cmd <<@$upload_cmd>> failed with $!";
-        }
-
-        print "Got URL:\n" , $urls->[0]->as_string(), "\n";
-
-        exit(0);
     }
     elsif (($verb eq 'up-r') || ($verb eq 'upload-recursive'))
     {
@@ -139,24 +147,15 @@ sub run
             die "Can only upload directories. '$filename' is not a valid directory name.";
         }
 
-        my $results =
-        $_calc_manager->()->get_recursive_upload_results(
-            {
-                filenames => [$filename],
-            }
+        $_handle_results->(
+            scalar(
+                $_calc_manager->()->get_recursive_upload_results(
+                    {
+                        filenames => [$filename],
+                    }
+                )
+            )
         );
-
-        my $upload_cmd = $results->upload_cmd();
-        my $urls = $results->urls();
-
-        if ((system { $upload_cmd->[0] } @$upload_cmd) != 0)
-        {
-            die "Upload cmd <<@$upload_cmd>> failed with $!";
-        }
-
-        print "Got URL:\n" , $urls->[0]->as_string(), "\n";
-
-        exit(0);
     }
     else
     {
