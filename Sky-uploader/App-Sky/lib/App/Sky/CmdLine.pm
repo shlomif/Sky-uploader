@@ -77,55 +77,104 @@ sub run
         return $self->_basic_help();
     }
 
-    if (not (($verb eq 'up') || ($verb eq 'upload')))
+    if ((($verb eq 'up') || ($verb eq 'upload')))
     {
-        return $self->_basic_usage();
-    }
+        # GetOptionsFromArray(
+        #     $self->argv(),
+        # );
 
-    # GetOptionsFromArray(
-    #     $self->argv(),
-    # );
+        my $filename = shift(@{$self->argv()});
 
-    my $filename = shift(@{$self->argv()});
+        my $dist_config_dir = File::HomeDir->my_dist_config( 'App-Sky', {create => 1}, );
 
-    my $dist_config_dir = File::HomeDir->my_dist_config( 'App-Sky', {create => 1}, );
+        my $config_fn = File::Spec->catfile($dist_config_dir, 'app_sky_conf.yml');
 
-    my $config_fn = File::Spec->catfile($dist_config_dir, 'app_sky_conf.yml');
+        my $config = LoadFile($config_fn);
 
-    my $config = LoadFile($config_fn);
+        my $validator = App::Sky::Config::Validate->new({ config => $config });
+        $validator->is_valid();
 
-    my $validator = App::Sky::Config::Validate->new({ config => $config });
-    $validator->is_valid();
+        my $manager = App::Sky::Manager->new(
+            {
+                config => $config,
+            }
+        );
 
-    my $manager = App::Sky::Manager->new(
+        if (! -f $filename)
         {
-            config => $config,
+            die "Can only upload files. '$filename' is not a valid filename.";
         }
-    );
 
-    if (! -f $filename)
-    {
-        die "Can only upload files. '$filename' is not a valid filename.";
-    }
-
-    my $results =
+        my $results =
         $manager->get_upload_results(
             {
                 filenames => [$filename],
             }
         );
 
-    my $upload_cmd = $results->upload_cmd();
-    my $urls = $results->urls();
+        my $upload_cmd = $results->upload_cmd();
+        my $urls = $results->urls();
 
-    if ((system { $upload_cmd->[0] } @$upload_cmd) != 0)
-    {
-        die "Upload cmd <<@$upload_cmd>> failed with $!";
+        if ((system { $upload_cmd->[0] } @$upload_cmd) != 0)
+        {
+            die "Upload cmd <<@$upload_cmd>> failed with $!";
+        }
+
+        print "Got URL:\n" , $urls->[0]->as_string(), "\n";
+
+        exit(0);
     }
+    elsif (($verb eq 'up-r') || ($verb eq 'upload-recursive'))
+    {
+        # GetOptionsFromArray(
+        #     $self->argv(),
+        # );
 
-    print "Got URL:\n" , $urls->[0]->as_string(), "\n";
+        my $filename = shift(@{$self->argv()});
 
-    exit(0);
+        my $dist_config_dir = File::HomeDir->my_dist_config( 'App-Sky', {create => 1}, );
+
+        my $config_fn = File::Spec->catfile($dist_config_dir, 'app_sky_conf.yml');
+
+        my $config = LoadFile($config_fn);
+
+        my $validator = App::Sky::Config::Validate->new({ config => $config });
+        $validator->is_valid();
+
+        my $manager = App::Sky::Manager->new(
+            {
+                config => $config,
+            }
+        );
+
+        if (! -d $filename)
+        {
+            die "Can only upload directories. '$filename' is not a valid directory name.";
+        }
+
+        my $results =
+        $manager->get_recursive_upload_results(
+            {
+                filenames => [$filename],
+            }
+        );
+
+        my $upload_cmd = $results->upload_cmd();
+        my $urls = $results->urls();
+
+        if ((system { $upload_cmd->[0] } @$upload_cmd) != 0)
+        {
+            die "Upload cmd <<@$upload_cmd>> failed with $!";
+        }
+
+        print "Got URL:\n" , $urls->[0]->as_string(), "\n";
+
+        exit(0);
+    }
+    else
+    {
+        return $self->_basic_usage();
+    }
 }
 
 1;
