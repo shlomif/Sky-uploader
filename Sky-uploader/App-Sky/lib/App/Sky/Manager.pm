@@ -134,7 +134,13 @@ sub _perform_upload_generic
 
     return $backend->get_upload_results(
         {
-            filenames => $filenames,
+
+            filenames =>
+            (
+                $is_dir
+                ?  [map { my $s = $_; $s =~ s#/+\z##ms; $s } @$filenames ]
+                : $filenames,
+            ),
             target_dir => $self->_calc_target_dir({
                     %$args,
                     basename => $bn,

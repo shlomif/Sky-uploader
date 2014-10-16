@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 20;
+use Test::More tests => 23;
 
 use Test::Differences (qw( eq_or_diff ));
 
@@ -296,6 +296,26 @@ package main;
             ],
         },
         'upload directory',
+    );
+
+    # TEST*$test_recursive_upload_results
+    $tester->test_recursive_upload_results(
+        {
+            input =>
+            {
+                'filenames' => ['/home/shlomif/progs/perl/cpan/App-Sky/', ],
+            },
+            upload_cmd =>
+            [qw(rsync -a -v --progress --inplace),
+                '/home/shlomif/progs/perl/cpan/App-Sky',
+                'hostgator:public_html/Files/files/dirs/',
+            ],
+            urls =>
+            [
+                'http://www.shlomifish.org/Files/files/dirs/App-Sky/',
+            ],
+        },
+        'trailing slash is removed on upload directory',
     );
 }
 

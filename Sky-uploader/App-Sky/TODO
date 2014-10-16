@@ -1,3 +1,6 @@
+* Add a --verbose flag to display the rsync/etc. command that is being
+used.
+
 DONE:
 -----
 
