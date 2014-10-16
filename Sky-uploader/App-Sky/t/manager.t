@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 16;
+use Test::More tests => 20;
 
 use Test::Differences (qw( eq_or_diff ));
 
@@ -50,6 +50,38 @@ sub test_upload_results
 }
 
 # TEST:$test_upload_results=$c;
+
+# TEST:$c=0;
+sub test_recursive_upload_results
+{
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my ($self, $args, $blurb_base) = @_;
+
+    my $results = $self->manager->get_recursive_upload_results(
+        $args->{input}
+    );
+
+    # TEST:$c++
+    ok ($results, "$blurb_base - Results were returned.");
+
+    # TEST:$c++
+    eq_or_diff (
+        $results->upload_cmd(),
+        $args->{upload_cmd},
+        "$blurb_base - results->upload_cmd() is correct.",
+    );
+
+    # TEST:$c++
+    eq_or_diff (
+        [map { $_->as_string() } @{$results->urls()}],
+        $args->{urls},
+        "$blurb_base - the result URLs are correct.",
+    );
+
+    return;
+}
+
+# TEST:$test_recursive_upload_results=$c;
 
 package main;
 
@@ -195,6 +227,75 @@ package main;
             ],
         },
         'target_dir',
+    );
+}
+
+{
+    my $manager = App::Sky::Manager->new(
+        {
+            config =>
+            {
+                default_site => "shlomif",
+                sites =>
+                {
+                    shlomif =>
+                    {
+                        base_upload_cmd => [qw(rsync -a -v --progress --inplace)],
+                        dest_upload_prefix => 'hostgator:public_html/',
+                        dest_upload_url_prefix => 'http://www.shlomifish.org/',
+                        dirs_section => 'dirs',
+                        sections =>
+                        {
+                            code =>
+                            {
+                                basename_re => q/\.(?:pl|pm|c|py)\z/,
+                                target_dir => "Files/files/code/",
+                            },
+                            dirs =>
+                            {
+                                basename_re => q/\.(?:MYDIR)\z/,
+                                target_dir => "Files/files/dirs/",
+                            },
+                            music =>
+                            {
+                                basename_re => q/\.(?:mp3|ogg|wav|aac|m4a)\z/,
+                                target_dir => "Files/files/music/mp3-ogg/",
+                            },
+                            video =>
+                            {
+                                basename_re => q/\.(?:webm|flv|avi|mpeg|mpg|mp4|ogv)\z/,
+                                target_dir => "Files/files/video/",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    );
+
+    # TEST
+    ok ($manager, 'Directories App::Sky::Manager was created.');
+
+    my $tester = ManagerTester->new({ manager => $manager });
+
+    # TEST*$test_recursive_upload_results
+    $tester->test_recursive_upload_results(
+        {
+            input =>
+            {
+                'filenames' => ['/home/shlomif/progs/perl/cpan/App-Sky', ],
+            },
+            upload_cmd =>
+            [qw(rsync -a -v --progress --inplace),
+                '/home/shlomif/progs/perl/cpan/App-Sky',
+                'hostgator:public_html/Files/files/dirs/',
+            ],
+            urls =>
+            [
+                'http://www.shlomifish.org/Files/files/dirs/App-Sky/',
+            ],
+        },
+        'upload directory',
     );
 }
 

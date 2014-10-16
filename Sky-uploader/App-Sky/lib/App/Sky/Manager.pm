@@ -53,14 +53,26 @@ sub _calc_sect_name
 
     my $bn = $args->{basename};
 
-    my $sect_name = $args->{section} //
-    (first
+    my $sect_name = $args->{section};
+
+    if (!defined ($sect_name))
+    {
+        if ($args->{is_dir})
         {
-            my $re = $sections->{$_}->{basename_re};
-            $bn =~ /$re/;
+            $sect_name = $self->_calc_site_conf($args)->{dirs_section};
         }
-        (keys(%$sections))
-    );
+        else
+        {
+            $sect_name =
+            (first
+                {
+                    my $re = $sections->{$_}->{basename_re};
+                    $bn =~ /$re/;
+                }
+                (keys(%$sections))
+            );
+        }
+    }
 
     if (!defined( $sect_name ))
     {
@@ -163,6 +175,80 @@ sub get_upload_results
                     %$args,
                     basename => $bn,
             }),
+        }
+    );
+}
+
+=head2 my $results = $sky->get_recursive_upload_results({ filenames => ['/home/music/Music/mp3s/Basic Desire/'], });
+
+Gives the recipe to execute for the recursive upload commands.
+
+Accepts one argument that is a hash reference with these keys:
+
+=over 4
+
+=item * 'filenames'
+
+An array reference containing paths to directories. Currently only supports
+one filename.
+
+=item * 'section'
+
+An optional section that will override the target section. If not specified,
+the uploader will try to use the 'dirs_section' section.
+
+=item * 'target_dir'
+
+Overrides the target directory for the upload, to ignore that dictated by
+the sections. Should point to a string.
+
+=back
+
+Returns a L<App::Sky::Results> reference containing:
+
+=over 4
+
+=item * upload_cmd
+
+The upload command to execute (as an array reference of strings).
+
+=back
+
+=cut
+sub get_recursive_upload_results
+{
+    my ($self, $args) = @_;
+
+    my $filenames = $args->{filenames}
+        or Carp::confess ("Missing argument 'filenames'");
+
+    if (@$filenames != 1)
+    {
+        Carp::confess ("More than one file passed to 'filenames'");
+    }
+
+    my $site_conf = $self->_calc_site_conf($args);
+
+    my $backend = App::Sky::Module->new(
+        {
+            base_upload_cmd => $site_conf->{base_upload_cmd},
+            dest_upload_prefix => $site_conf->{dest_upload_prefix},
+            dest_upload_url_prefix => $site_conf->{dest_upload_url_prefix},
+        }
+    );
+
+    my $fn = $filenames->[0];
+    my $bn = basename($fn);
+
+    return $backend->get_upload_results(
+        {
+            filenames => $filenames,
+            target_dir => $self->_calc_target_dir({
+                    %$args,
+                    basename => $bn,
+                    is_dir => 1,
+            }),
+            is_dir => 1,
         }
     );
 }

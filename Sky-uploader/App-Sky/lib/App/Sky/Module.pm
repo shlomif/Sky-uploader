@@ -70,6 +70,8 @@ sub get_upload_results
 {
     my ($self, $args) = @_;
 
+    my $is_dir = ($args->{is_dir} // 0);
+
     my $filenames = $args->{filenames}
         or Carp::confess ("Missing argument 'filenames'");
 
@@ -107,6 +109,7 @@ sub get_upload_results
                     $self->dest_upload_url_prefix()
                     . $target_dir
                     . basename($filenames->[0])
+                    . ($is_dir ? '/' : '')
                 ),
             ],
         }
