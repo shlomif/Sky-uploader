@@ -3,7 +3,7 @@ package App::Sky::CmdLine;
 use strict;
 use warnings;
 
-our $VERSION = '0.2.0';
+our $VERSION = '0.2.1';
 
 =encoding utf8
 
@@ -48,6 +48,7 @@ sub _basic_help
 
     print <<'EOF';
 sky upload /path/to/myfile.txt
+sky up-r /path/to/directory
 EOF
 
     exit(0);

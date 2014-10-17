@@ -1,5 +1,8 @@
 Revision history for App-Sky
 
+v0.2.1      2014-10-17
+    - Document the "up-r" command.
+
 v0.2.0      2014-10-16
     - Add the "up-r" sub-command to upload sub-dirs.
 
