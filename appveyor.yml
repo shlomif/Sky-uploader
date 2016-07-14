@@ -14,6 +14,8 @@ install:
     - cpanm -n Dist::Zilla
     - cpanm -n Dist::Zilla::Plugin::PodWeaver
     - cpanm -n Pod::Weaver::Section::Support
+    - cpanm -n Test::Pod
+    - cpanm -n Test::Pod::Coverage
     - cd Sky-uploader\App-Sky
     - dzil authordeps --missing | cpanm -n
     - dzil listdeps   --missing | cpanm -n
