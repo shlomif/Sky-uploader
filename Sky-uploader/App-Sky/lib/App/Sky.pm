@@ -3,7 +3,7 @@ package App::Sky;
 use strict;
 use warnings;
 
-our $VERSION = '0.2.1';
+our $VERSION = 'v0.2.1';
 
 =head1 NAME
 
