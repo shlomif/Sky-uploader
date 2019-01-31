@@ -47,6 +47,8 @@ sub _basic_help
     print <<'EOF';
 sky upload /path/to/myfile.txt
 sky up-r /path/to/directory
+
+Specifying --copy or -x will copy the URL to the clipboard.
 EOF
 
     exit(0);
@@ -64,6 +66,8 @@ sub run
 {
     my ($self) = @_;
 
+    my $copy = 0;
+
     if ( !@{ $self->argv() } )
     {
         return $self->_basic_usage();
@@ -74,6 +78,13 @@ sub run
     if ( ( $verb eq '--help' ) or ( $verb eq '-h' ) )
     {
         return $self->_basic_help();
+    }
+
+    if ( $verb =~ /\A(--copy|-x)\z/ )
+    {
+        $copy = 1;
+
+        $verb = shift( @{ $self->argv() } );
     }
 
     my $_calc_manager = sub {
@@ -107,7 +118,16 @@ sub run
             die "Upload cmd <<@$upload_cmd>> failed with $!";
         }
 
-        print "Got URL:\n", $urls->[0]->as_string(), "\n";
+        my $URL = $urls->[0]->as_string();
+
+        print "Got URL:\n", $URL, "\n";
+
+        if ($copy)
+        {
+            require Clipboard;
+            Clipboard->VERSION('0.19');
+            Clipboard->copy_to_all_selections($URL);
+        }
 
         exit(0);
     };
@@ -155,4 +175,3 @@ sub run
 }
 
 1;
-
