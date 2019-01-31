@@ -16,8 +16,8 @@ use URI;
 use Moo;
 use MooX 'late';
 
-has upload_cmd => (isa => 'ArrayRef[Str]', is => 'ro',);
-has urls => (isa => 'ArrayRef[URI]', is => 'ro',);
+has upload_cmd => ( isa => 'ArrayRef[Str]', is => 'ro', );
+has urls       => ( isa => 'ArrayRef[URI]', is => 'ro', );
 
 =head1 METHODS
 

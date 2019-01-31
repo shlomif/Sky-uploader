@@ -26,7 +26,7 @@ use YAML::XS qw(LoadFile);
 
 use Scalar::Util qw(reftype);
 
-has 'argv' => (isa => 'ArrayRef[Str]', is => 'rw', required => 1,);
+has 'argv' => ( isa => 'ArrayRef[Str]', is => 'rw', required => 1, );
 
 =head1 METHODS
 
@@ -64,26 +64,29 @@ sub run
 {
     my ($self) = @_;
 
-    if (! @{$self->argv()})
+    if ( !@{ $self->argv() } )
     {
         return $self->_basic_usage();
     }
 
-    my $verb = shift(@{$self->argv()});
+    my $verb = shift( @{ $self->argv() } );
 
-    if (($verb eq '--help') or ($verb eq '-h'))
+    if ( ( $verb eq '--help' ) or ( $verb eq '-h' ) )
     {
         return $self->_basic_help();
     }
 
     my $_calc_manager = sub {
-        my $dist_config_dir = File::HomeDir->my_dist_config( 'App-Sky', {create => 1}, );
+        my $dist_config_dir =
+            File::HomeDir->my_dist_config( 'App-Sky', { create => 1 }, );
 
-        my $config_fn = File::Spec->catfile($dist_config_dir, 'app_sky_conf.yml');
+        my $config_fn =
+            File::Spec->catfile( $dist_config_dir, 'app_sky_conf.yml' );
 
         my $config = LoadFile($config_fn);
 
-        my $validator = App::Sky::Config::Validate->new({ config => $config });
+        my $validator =
+            App::Sky::Config::Validate->new( { config => $config } );
         $validator->is_valid();
 
         return App::Sky::Manager->new(
@@ -97,24 +100,24 @@ sub run
         my ($results) = @_;
 
         my $upload_cmd = $results->upload_cmd();
-        my $urls = $results->urls();
+        my $urls       = $results->urls();
 
-        if ((system { $upload_cmd->[0] } @$upload_cmd) != 0)
+        if ( ( system { $upload_cmd->[0] } @$upload_cmd ) != 0 )
         {
             die "Upload cmd <<@$upload_cmd>> failed with $!";
         }
 
-        print "Got URL:\n" , $urls->[0]->as_string(), "\n";
+        print "Got URL:\n", $urls->[0]->as_string(), "\n";
 
         exit(0);
     };
 
     my $op;
-    if ((($verb eq 'up') || ($verb eq 'upload')))
+    if ( ( ( $verb eq 'up' ) || ( $verb eq 'upload' ) ) )
     {
         $op = 'upload';
     }
-    elsif (($verb eq 'up-r') || ($verb eq 'upload-recursive'))
+    elsif ( ( $verb eq 'up-r' ) || ( $verb eq 'upload-recursive' ) )
     {
         $op = "up-r";
     }
@@ -123,19 +126,20 @@ sub run
         return $self->_basic_usage();
     }
 
-
     # GetOptionsFromArray(
     #     $self->argv(),
     # );
 
-    my $filename = shift(@{$self->argv()});
+    my $filename = shift( @{ $self->argv() } );
 
-    if (not (($op eq 'upload') ? (-f $filename) : (-d $filename)))
+    if ( not( ( $op eq 'upload' ) ? ( -f $filename ) : ( -d $filename ) ) )
     {
-        die "Can only upload directories. '$filename' is not a valid directory name.";
+        die
+"Can only upload directories. '$filename' is not a valid directory name.";
     }
 
-    my $meth = $op eq 'upload' ? 'get_upload_results' : 'get_recursive_upload_results';
+    my $meth =
+        $op eq 'upload' ? 'get_upload_results' : 'get_recursive_upload_results';
 
     $_handle_results->(
         scalar(

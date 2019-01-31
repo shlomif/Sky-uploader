@@ -26,7 +26,7 @@ use App::Sky::Module;
 # For defined-or - "//".
 use 5.010;
 
-has config => (isa => 'HashRef', is => 'ro',);
+has config => ( isa => 'HashRef', is => 'ro', );
 
 =head1 METHODS
 
@@ -38,7 +38,7 @@ The configuration of the app as passed through the configuration file.
 
 sub _calc_site_conf
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
     my $config = $self->config;
 
@@ -47,39 +47,39 @@ sub _calc_site_conf
 
 sub _calc_sect_name
 {
-    my ($self, $args, $sections) = @_;
+    my ( $self, $args, $sections ) = @_;
 
     my $bn = $args->{basename};
 
     my $sect_name = $args->{section};
 
-    if (!defined ($sect_name))
+    if ( !defined($sect_name) )
     {
-        if ($args->{is_dir})
+        if ( $args->{is_dir} )
         {
             $sect_name = $self->_calc_site_conf($args)->{dirs_section};
         }
         else
         {
-            $sect_name =
-            (first
+            $sect_name = (
+                first
                 {
                     my $re = $sections->{$_}->{basename_re};
                     $bn =~ /$re/;
                 }
-                (keys(%$sections))
+                ( keys(%$sections) )
             );
         }
     }
 
-    if (!defined( $sect_name ))
+    if ( !defined($sect_name) )
     {
-        Carp::confess ("Unknown section for basename '$bn'");
+        Carp::confess("Unknown section for basename '$bn'");
     }
 
-    if (!exists( $sections->{$sect_name} ))
+    if ( !exists( $sections->{$sect_name} ) )
     {
-        Carp::confess ("Section '$sect_name' does not exist.");
+        Carp::confess("Section '$sect_name' does not exist.");
     }
 
     return $sect_name;
@@ -87,9 +87,9 @@ sub _calc_sect_name
 
 sub _calc_target_dir
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
-    if (defined( $args->{target_dir} ))
+    if ( defined( $args->{target_dir} ) )
     {
         return $args->{target_dir};
     }
@@ -105,22 +105,22 @@ sub _calc_target_dir
 
 sub _perform_upload_generic
 {
-    my ($self, $is_dir, $args) = @_;
+    my ( $self, $is_dir, $args ) = @_;
 
     my $filenames = $args->{filenames}
-        or Carp::confess ("Missing argument 'filenames'");
+        or Carp::confess("Missing argument 'filenames'");
 
-    if (@$filenames != 1)
+    if ( @$filenames != 1 )
     {
-        Carp::confess ("More than one file passed to 'filenames'");
+        Carp::confess("More than one file passed to 'filenames'");
     }
 
     my $site_conf = $self->_calc_site_conf($args);
 
     my $backend = App::Sky::Module->new(
         {
-            base_upload_cmd => $site_conf->{base_upload_cmd},
-            dest_upload_prefix => $site_conf->{dest_upload_prefix},
+            base_upload_cmd        => $site_conf->{base_upload_cmd},
+            dest_upload_prefix     => $site_conf->{dest_upload_prefix},
             dest_upload_url_prefix => $site_conf->{dest_upload_url_prefix},
         }
     );
@@ -128,22 +128,23 @@ sub _perform_upload_generic
     my $fn = $filenames->[0];
     my $bn = basename($fn);
 
-    my @dir = ($is_dir ? (is_dir => 1) : ());
+    my @dir = ( $is_dir ? ( is_dir => 1 ) : () );
 
     return $backend->get_upload_results(
         {
 
-            filenames =>
-            (
+            filenames => (
                 $is_dir
-                ?  [map { my $s = $_; $s =~ s#/+\z##ms; $s } @$filenames ]
+                ? [ map { my $s = $_; $s =~ s#/+\z##ms; $s } @$filenames ]
                 : $filenames,
             ),
-            target_dir => $self->_calc_target_dir({
+            target_dir => $self->_calc_target_dir(
+                {
                     %$args,
                     basename => $bn,
                     @dir,
-            }),
+                }
+            ),
             @dir,
         }
     );
@@ -190,9 +191,9 @@ The upload command to execute (as an array reference of strings).
 
 sub get_upload_results
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
-    return $self->_perform_upload_generic(0, $args);
+    return $self->_perform_upload_generic( 0, $args );
 }
 
 =head2 my $results = $sky->get_recursive_upload_results({ filenames => ['/home/music/Music/mp3s/Basic Desire/'], });
@@ -234,11 +235,10 @@ The upload command to execute (as an array reference of strings).
 
 sub get_recursive_upload_results
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
-    return $self->_perform_upload_generic(1, $args);
+    return $self->_perform_upload_generic( 1, $args );
 }
-
 
 1;
 

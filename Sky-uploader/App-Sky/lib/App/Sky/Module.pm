@@ -22,9 +22,9 @@ use List::MoreUtils qw( uniq );
 use App::Sky::Results;
 use App::Sky::Exception;
 
-has base_upload_cmd => (isa => 'ArrayRef[Str]', is => 'ro',);
-has dest_upload_prefix => (isa => 'Str', is => 'ro',);
-has dest_upload_url_prefix => (isa => 'Str', is => 'ro',);
+has base_upload_cmd        => ( isa => 'ArrayRef[Str]', is => 'ro', );
+has dest_upload_prefix     => ( isa => 'Str',           is => 'ro', );
+has dest_upload_url_prefix => ( isa => 'Str',           is => 'ro', );
 
 =head1 METHODS
 
@@ -66,54 +66,50 @@ The upload command to execute (as an array reference of strings).
 
 sub get_upload_results
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
-    my $is_dir = ($args->{is_dir} // 0);
+    my $is_dir = ( $args->{is_dir} // 0 );
 
     my $filenames = $args->{filenames}
-        or Carp::confess ("Missing argument 'filenames'");
+        or Carp::confess("Missing argument 'filenames'");
 
-    if (@$filenames != 1)
+    if ( @$filenames != 1 )
     {
-        Carp::confess ("More than one file passed to 'filenames'");
+        Carp::confess("More than one file passed to 'filenames'");
     }
 
     my $target_dir = $args->{target_dir}
-        or Carp::confess ("Missing argument 'target_dir'");
+        or Carp::confess("Missing argument 'target_dir'");
 
     my $invalid_chars_re = qr/[:]/;
 
-    my @invalid_chars = (map { split( //, $_) } map { /($invalid_chars_re)/g } @$filenames);
+    my @invalid_chars =
+        ( map { split( //, $_ ) } map { /($invalid_chars_re)/g } @$filenames );
 
     if (@invalid_chars)
     {
         App::Sky::Exception::Upload::Filename::InvalidChars->throw(
-            invalid_chars =>
-            [sort { $a cmp $b } uniq(@invalid_chars)],
-        );
+            invalid_chars => [ sort { $a cmp $b } uniq(@invalid_chars) ], );
     }
 
     return App::Sky::Results->new(
         {
-            upload_cmd =>
-            [
-                @{$self->base_upload_cmd()},
+            upload_cmd => [
+                @{ $self->base_upload_cmd() },
                 @$filenames,
-                ($self->dest_upload_prefix() . $target_dir),
+                ( $self->dest_upload_prefix() . $target_dir ),
             ],
-            urls =>
-            [
+            urls => [
                 URI->new(
-                    $self->dest_upload_url_prefix()
-                    . $target_dir
-                    . basename($filenames->[0])
-                    . ($is_dir ? '/' : '')
+                          $self->dest_upload_url_prefix()
+                        . $target_dir
+                        . basename( $filenames->[0] )
+                        . ( $is_dir ? '/' : '' )
                 ),
             ],
         }
     );
 }
-
 
 1;
 

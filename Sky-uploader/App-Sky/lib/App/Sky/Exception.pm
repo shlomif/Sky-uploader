@@ -11,13 +11,12 @@ App::Sky::Exception - provides various exception classes for App::Sky
 
 use Exception::Class (
     'App::Sky::Exception',
-    'App::Sky::Exception::Upload' =>
-    { isa => "App::Sky::Exception", },
+    'App::Sky::Exception::Upload' => { isa => "App::Sky::Exception", },
     'App::Sky::Exception::Upload::Filename' =>
-    { isa => "App::Sky::Exception::Upload", },
-    'App::Sky::Exception::Upload::Filename::InvalidChars' =>
-    { isa => "App::Sky::Exception::Upload",
-        fields => [ 'invalid_chars' ],
+        { isa => "App::Sky::Exception::Upload", },
+    'App::Sky::Exception::Upload::Filename::InvalidChars' => {
+        isa    => "App::Sky::Exception::Upload",
+        fields => ['invalid_chars'],
     },
 );
 
