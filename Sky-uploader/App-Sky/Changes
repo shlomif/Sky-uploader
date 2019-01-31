@@ -1,6 +1,6 @@
 Revision history for App-Sky
 
-v0.4.0      2019-01-31
+0.4.0       2019-01-31
     - Add the --copy / -x flag to copy the upload URL to the clipboard.
 
 v0.2.1      2014-10-17
