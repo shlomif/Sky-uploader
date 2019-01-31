@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+# PODNAME: sky
+
 use strict;
 use warnings;
 
