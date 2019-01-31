@@ -3,8 +3,6 @@ package App::Sky::Results;
 use strict;
 use warnings;
 
-our $VERSION = '0.2.1';
-
 =head1 NAME
 
 App::Sky::Results - results of an upload.

@@ -3,8 +3,6 @@ package App::Sky::Module;
 use strict;
 use warnings;
 
-our $VERSION = '0.2.1';
-
 =head1 NAME
 
 App::Sky::Module - class that does the heavy lifting.

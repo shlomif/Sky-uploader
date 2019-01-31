@@ -3,8 +3,6 @@ package App::Sky;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.2.1';
-
 =head1 NAME
 
 App::Sky - wrapper to rsync/etc. to upload files to a remote server and give

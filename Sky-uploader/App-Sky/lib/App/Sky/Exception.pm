@@ -9,10 +9,6 @@ App::Sky::Exception - provides various exception classes for App::Sky
 
 =cut
 
-use vars qw($VERSION);
-
-$VERSION = '0.2.1';
-
 use Exception::Class (
     'App::Sky::Exception',
     'App::Sky::Exception::Upload' =>
