@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-eval "use Test::TrailingSpace";
+eval { require Test::TrailingSpace; };
 if ($@)
 {
     plan skip_all => "Test::TrailingSpace required for trailing space test.";
@@ -25,4 +25,3 @@ qr/(?:(?:\.(?:t|pm|pl|PL|yml|json|arc|vim|ini))|README|Changes|LICENSE|MANIFEST)
 
 # TEST
 $finder->no_trailing_space("No trailing space was found.");
-

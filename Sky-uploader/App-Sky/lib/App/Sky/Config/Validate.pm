@@ -38,7 +38,9 @@ sub _sorted_keys
 {
     my $hash_ref = shift;
 
-    return sort { $a cmp $b } keys(%$hash_ref);
+    my @ret = sort { $a cmp $b } keys(%$hash_ref);
+
+    return @ret;
 }
 
 sub _validate_section

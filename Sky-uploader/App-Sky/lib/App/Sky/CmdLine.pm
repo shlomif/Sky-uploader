@@ -124,7 +124,8 @@ sub run
 
         if ($copy)
         {
-            eval "use Clipboard 0.19;";
+            require Clipboard;
+            Clipboard->VERSION('0.19');
             Clipboard->copy_to_all_selections($URL);
         }
 
