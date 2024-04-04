@@ -16,7 +16,7 @@ use Carp ();
 use Moo;
 use MooX 'late';
 
-use Scalar::Util qw(reftype);
+use Scalar::Util    qw(reftype);
 use List::MoreUtils qw(notall);
 
 has 'config' => ( isa => 'HashRef', is => 'ro', required => 1, );

@@ -66,8 +66,7 @@ sub _calc_sect_name
                 {
                     my $re = $sections->{$_}->{basename_re};
                     $bn =~ /$re/;
-                }
-                ( keys(%$sections) )
+                } ( keys(%$sections) )
             );
         }
     }
