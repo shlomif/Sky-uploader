@@ -166,6 +166,8 @@ sub run
         if ( not( -e $config_fn ) )
         {
             _write_utf8_file( $config_fn, $INIT_YAML_CONFIG_CONTENTS );
+            warn
+qq#Populated the "$config_fn" configuration file with initial contents. You should review it.#;
         }
 
         my $config = LoadFile($config_fn);
