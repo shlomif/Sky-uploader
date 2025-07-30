@@ -11,7 +11,7 @@ App::Sky::Results - results of an upload.
 
 use Carp ();
 
-use URI;
+use URI ();
 
 use Moo;
 use MooX 'late';

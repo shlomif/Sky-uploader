@@ -18,10 +18,9 @@ use MooX 'late';
 
 use List::Util qw(first);
 
-use URI;
 use File::Basename qw(basename);
 
-use App::Sky::Module;
+use App::Sky::Module ();
 
 # For defined-or - "//".
 use 5.010;

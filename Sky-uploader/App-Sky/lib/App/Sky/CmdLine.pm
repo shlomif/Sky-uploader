@@ -20,9 +20,9 @@ use MooX 'late';
 
 use Getopt::Long qw(GetOptionsFromArray);
 
-use App::Sky::Config::Validate;
-use App::Sky::Manager;
-use File::HomeDir;
+use App::Sky::Config::Validate ();
+use App::Sky::Manager          ();
+use File::HomeDir              ();
 
 use YAML::XS qw(LoadFile);
 

@@ -14,13 +14,13 @@ use Carp ();
 use Moo;
 use MooX 'late';
 
-use URI;
+use URI            ();
 use File::Basename qw(basename);
 
 use List::MoreUtils qw( uniq );
 
-use App::Sky::Results;
-use App::Sky::Exception;
+use App::Sky::Results   ();
+use App::Sky::Exception ();
 
 has base_upload_cmd        => ( isa => 'ArrayRef[Str]', is => 'ro', );
 has dest_upload_prefix     => ( isa => 'Str',           is => 'ro', );
