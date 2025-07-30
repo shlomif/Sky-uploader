@@ -7,7 +7,7 @@ use Test::More tests => 23;
 
 use Test::Differences (qw( eq_or_diff ));
 
-use App::Sky::Manager;
+use App::Sky::Manager ();
 
 package ManagerTester;
 
@@ -286,4 +286,3 @@ package main;
         'trailing slash is removed on upload directory',
     );
 }
-
