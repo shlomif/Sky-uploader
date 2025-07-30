@@ -62,11 +62,15 @@ The upload command to execute (as an array reference of strings).
 
 =back
 
+Accepts an 'overrides' named parameter.
+
 =cut
 
 sub get_upload_results
 {
     my ( $self, $args ) = @_;
+
+    my $overrides = $args->{overrides} // {};
 
     my $is_dir = ( $args->{is_dir} // 0 );
 
@@ -97,12 +101,21 @@ sub get_upload_results
             upload_cmd => [
                 @{ $self->base_upload_cmd() },
                 @$filenames,
-                ( $self->dest_upload_prefix() . $target_dir ),
+                (
+                    (
+                        $overrides->{dest_upload_prefix}
+                            // $self->dest_upload_prefix()
+                    )
+                    . $target_dir
+                ),
             ],
             urls => [
                 URI->new(
-                          $self->dest_upload_url_prefix()
-                        . $target_dir
+                    (
+                        $overrides->{dest_upload_url_prefix}
+                            // $self->dest_upload_url_prefix()
+                    )
+                    . $target_dir
                         . basename( $filenames->[0] )
                         . ( $is_dir ? '/' : '' )
                 ),
